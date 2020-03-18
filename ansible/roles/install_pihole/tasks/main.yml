@@ -11,7 +11,7 @@
       - unzip
       - dns-root-data
       - resolvconf
-      - lighttpd 
+      - lighttpd
       - php-common
       - php-cgi
       - php-sqlite3
@@ -40,7 +40,7 @@
   tags:
     - pihole_vm
   when: "'pihole_vm' in group_names"
-  
+
 - name: create pihole directory
   file:
     path: /etc/pihole
@@ -70,7 +70,12 @@
     mode: 0740
   tags: pihole_vm
 
+- name: 'Check if /etc/pihole/setupVars.conf already exists'
+  stat: path=/usr/local/bin/pihole
+  register: pihole_installed
+  tags: pihole_vm
+
 - name: Install Pi-Hole
   shell: "~/install-pihole.sh --unattended"
-  register: dbg_install_pihole
   tags: pihole_vm
+  when: not pihole_installed.stat.exists
