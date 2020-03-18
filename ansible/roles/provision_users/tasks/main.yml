@@ -36,7 +36,6 @@
       - plugdev
       - lpadmin
       - sambashare
-      - media_access
     state: present
     shell: /bin/bash
     system: no
