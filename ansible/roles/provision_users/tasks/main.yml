@@ -23,7 +23,7 @@
     - useradd
     - kris
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-  
+
 - name: Create user account - Plex
   user:
     comment: Plex User
@@ -81,7 +81,7 @@
   tags:
     - ssh
     - kris
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname != "titanium"
 
@@ -95,7 +95,7 @@
   tags:
     - ssh
     - kris
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
 
@@ -109,10 +109,10 @@
   tags:
     - ssh
     - jarvis
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
-    
+
 - name: Install public key for jarvis
   copy:
     content: '{{ jarvis_ssl_certificate }}'
@@ -123,7 +123,7 @@
   tags:
     - ssh
     - jarvis
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
 
@@ -138,10 +138,10 @@
   tags:
     - ssh
     - jarvis
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
-  
+
 - name: Install public key for kris
   copy:
     content: '{{ kris_ssl_certificate }}'
@@ -152,7 +152,7 @@
   tags:
     - ssh
     - kris
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
 
@@ -167,6 +167,6 @@
   tags:
     - ssh
     - kris
-  when: 
+  when:
     - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     - inventory_hostname == "titanium"
