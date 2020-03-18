@@ -6,4 +6,5 @@
   notify: Reboot host and wait for it to restart
   tags:
     - nvidiadrivers
+    - skip_lint
   when: ansible_distribution == 'Ubuntu'
