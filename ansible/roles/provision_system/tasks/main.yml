@@ -1,0 +1,31 @@
+---
+
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    update_cache: yes
+    upgrade: safe
+    cache_valid_time: 86400 #One day
+    install_recommends: no
+  tags:
+    - provision
+
+- name: Disable Root Login
+  lineinfile:
+    dest=/etc/ssh/sshd_config
+    regexp='^PermitRootLogin'
+    line="PermitRootLogin no"
+    state=present
+    backup=yes
+  notify:
+    - restart sshd
+  tags:
+    - provision
+
+- name: Check if a reboot is needed
+  register: reboot_required_file
+  stat: path=/var/run/reboot-required get_md5=no
+  changed_when: reboot_required_file.stat.exists
+  notify: Reboot host for kernel updates
+  tags:
+    - provision

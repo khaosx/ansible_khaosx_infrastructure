@@ -1,0 +1,60 @@
+### Ansible Inventory
+
+## Organize by OS
+
+[ubuntu]
+iridium
+mercury
+palladium
+phosphorus
+#silver
+silver2
+titanium
+
+#[macos]
+#lithium
+#sodium
+
+#[raspbian]
+#gold
+
+#[windows10]
+#cesium
+
+## Organize by role
+
+[database_mysql]
+palladium
+
+#[desktops]
+#lithium
+#sodium
+#cesium
+
+[dns_dhcp]
+iridium
+
+#[docker]
+#mercury
+
+[tools]
+titanium ansible_connection=local
+
+#[pihole_pi]
+#gold
+
+[pihole_vm]
+silver2 ansible_host=192.168.10.9
+
+[plex]
+phosphorus
+
+## Organize by parent group
+
+[pihole:children]
+#pihole_pi
+pihole_vm
+
+#[desktops:children]
+#[macos]
+#[windows10]

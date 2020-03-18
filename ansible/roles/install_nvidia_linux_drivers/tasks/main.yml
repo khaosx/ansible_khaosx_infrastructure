@@ -1,0 +1,9 @@
+---
+- name: Install nVidia drivers
+  register: nvidiacheck
+  shell: ubuntu-drivers autoinstall
+  changed_when: "'0 upgraded, 0 newly installed' not in nvidiacheck.stdout"
+  notify: Reboot host and wait for it to restart
+  tags:
+    - nvidiadrivers
+  when: ansible_distribution == 'Ubuntu'

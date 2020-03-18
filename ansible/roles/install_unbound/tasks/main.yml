@@ -1,0 +1,44 @@
+---
+
+- name: Install unbound and pre-reqs
+  apt:
+    pkg:
+      - unbound
+    state: present
+  tags:
+    - packages
+    - unbound
+
+- name: Create unbound.conf from template
+  template:
+    src: unbound.conf.j2
+    dest: /etc/unbound/unbound.conf.d/unbound.conf
+    owner: root
+    group: root
+  tags:
+    - unbound
+
+- name: Download root hint file
+  get_url:
+    url: https://www.internic.net/domain/named.root
+    dest: /var/lib/unbound/root.hints
+  tags:
+    - unbound
+
+- name: Create resolved.conf from template
+  template:
+    src: resolved.conf.j2
+    dest: /etc/systemd/resolved.conf
+    owner: root
+    group: root
+  tags:
+    - unbound
+
+- name: Autostart Unbound and start service
+  service:
+    name: unbound
+    enabled: true
+  notify: restart unbound
+  tags:
+    - unbound
+    - service.restart
