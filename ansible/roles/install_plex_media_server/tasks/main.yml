@@ -1,0 +1,140 @@
+---
+- name: Install packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - cifs-utils
+      - ubuntu-drivers-common
+      - git-core
+    state: present
+  tags:
+    - plex
+    - packages
+
+- name: Create group "media_access"
+  group:
+    name: media_access
+    gid: 910
+    state: present
+  tags:
+    - plex
+    - groups
+
+- name: Add user "kris" to media_access group
+  user:
+    name: kris
+    groups: media_access
+    append: yes
+  tags:
+    - plex
+    - groups
+  
+- name: Add user "plex" to media_access group
+  user:
+    name: plex
+    groups: media_access
+    append: yes
+  tags:
+    - plex
+    - groups
+
+- name: Add carbon to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "192.168.15.100     qnap-san"
+    state: present
+  changed_when: false
+  tags:
+    - plex
+    - hosts
+
+- name: Create credential file (used for fstab entry)
+  copy:
+    content: |
+      username={{ smb_user }}
+      password={{ smb_pass }}
+    dest: /root/.smbcredentials
+    mode: 0600
+  tags:
+    - plex
+    - mounts
+
+- name: Create mount points
+  file:
+    path: /media/{{ item }}
+    state: directory
+    mode: '0755'
+  loop:
+    - nas_media1
+    - nas_media2
+  tags:
+    - plex
+    - mounts
+
+- name: Create fstab entry for nas share media1
+  mount:
+    state: present
+    fstype: cifs
+    opts: "{{ fstab_opts }}"
+    src: "//qnap-san/Media"
+    path: "/media/nas_media1"
+  tags:
+    - plex
+    - mounts
+
+- name: Create fstab entry for nas share media2
+  mount:
+    state: present
+    fstype: cifs
+    opts: "{{ fstab_opts }}"
+    src: "//qnap-san/Media2"
+    path: "/media/nas_media2"
+  tags:
+    - plex
+    - mounts
+
+- name: Add an Apt signing key for Plex
+  apt_key:
+    url: https://downloads.plex.tv/plex-keys/PlexSign.key
+    state: present
+  tags:
+    - plex
+    - apt
+
+- name: Add Plex repository into sources list
+  apt_repository:
+    repo: deb https://downloads.plex.tv/repo/deb public main
+    filename: plexmediaserver
+    state: present
+  changed_when: false
+  tags:
+    - plex
+    - apt
+
+- name: Install Plex
+  apt:
+    pkg:
+     - plexmediaserver
+    state: present
+  tags:
+    - plex
+    - packages
+
+- name: Autostart Plex and start service
+  service:
+    name: plexmediaserver
+    enabled: true
+  notify: restart plex
+  tags:
+    - plex
+    - services
+
+- name: Add JBOPS repo from git
+  become: yes
+  git:
+    executable: /usr/bin/git
+    repo: https://github.com/blacktwin/JBOPS.git
+    dest: /home/jarvis/jbops
+  tags:
+    - plex
+    - git

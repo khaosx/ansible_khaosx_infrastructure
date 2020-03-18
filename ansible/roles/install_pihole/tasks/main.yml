@@ -1,0 +1,76 @@
+---
+
+- name: Install Pi-hole pre-requisites
+  apt:
+    pkg:
+      - dialog
+      - curl
+      - netcat
+      - idn2
+      - sqlite3
+      - unzip
+      - dns-root-data
+      - resolvconf
+      - lighttpd 
+      - php-common
+      - php-cgi
+      - php-sqlite3
+    state: present
+  tags:
+  - pihole_vm
+
+- name: create pihole directory
+  file:
+    path: /etc/pihole
+    owner: pihole
+    group: pihole
+    state: directory
+    mode: 0740
+  tags:
+    - pihole_vm
+  when: "'pihole_vm' in group_names"
+
+- name: Create pihole-setupVars.conf from template
+  template:
+    src: pihole-setupVars.conf.j2
+    dest: /etc/pihole/setupVars.conf
+    owner: pihole
+    group: pihole
+    mode: 0644
+  tags:
+    - pihole_vm
+  when: "'pihole_vm' in group_names"
+  
+- name: create pihole directory
+  file:
+    path: /etc/pihole
+    owner: pi
+    group: pi
+    state: directory
+    mode: 0740
+  tags:
+    - pihole_pi
+  when: "'pihole_pi' in group_names"
+
+- name: Create pihole-setupVars.conf from template
+  template:
+    src: pihole-setupVars.conf.j2
+    dest: /etc/pihole/setupVars.conf
+    owner: pi
+    group: pi
+    mode: 0644
+  tags:
+    - pihole_pi
+  when: "'pihole_pi' in group_names"
+
+- name: "Download Pi-Hole installer"
+  get_url:
+    url: https://install.pi-hole.net
+    dest: ~/install-pihole.sh
+    mode: 0740
+  tags: pihole_vm
+
+- name: Install Pi-Hole
+  shell: "~/install-pihole.sh --unattended"
+  register: dbg_install_pihole
+  tags: pihole_vm
