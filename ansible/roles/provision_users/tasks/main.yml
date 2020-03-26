@@ -1,4 +1,5 @@
 ---
+
 - name: Create user account - Kris
   user:
     comment: Kristopher Newman
@@ -19,10 +20,17 @@
     system: no
     createhome: yes
     home: /home/kris
-  tags:
-    - useradd
-    - kris
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Deploy SSH key for kris from github
+  authorized_key:
+    user: kris
+    key: "https://github.com/khaosx.keys"
+
+- name: Add Kris user to the sudoers
+  copy:
+    dest: "/etc/sudoers.d/kris"
+    content: "kris  ALL=(ALL)  NOPASSWD: ALL"
 
 - name: Create user account - Plex
   user:
@@ -62,110 +70,3 @@
     - useradd
     - pihole
   when: "'pihole_vm' in group_names"
-
-- name: Add Kris user to the sudoers
-  copy:
-    dest: "/etc/sudoers.d/kris"
-    content: "kris  ALL=(ALL)  NOPASSWD: ALL"
-  tags:
-    - sudo
-    - kris
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: Deploy SSH key for kris
-  authorized_key:
-    user: kris
-    state: present
-    key: "{{ lookup('file', 'kris_public_key') }}"
-  tags:
-    - ssh
-    - kris
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname != "titanium"
-
-- name: Create .ssh directory for kris
-  file:
-    path: /home/jarvis/.ssh
-    state: directory
-    owner: kris
-    group: kris
-    mode: '0700'
-  tags:
-    - ssh
-    - kris
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"
-
-- name: Create .ssh directory for jarvis
-  file:
-    path: /home/jarvis/.ssh
-    state: directory
-    owner: jarvis
-    group: jarvis
-    mode: '0700'
-  tags:
-    - ssh
-    - jarvis
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"
-
-- name: Install public key for jarvis
-  copy:
-    content: '{{ jarvis_ssl_certificate }}'
-    dest: /home/jarvis/.ssh/id_rsa.pub
-    owner: jarvis
-    group: jarvis
-    mode: 0644
-  tags:
-    - ssh
-    - jarvis
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"
-
-- name: Install private key for jarvis
-  copy:
-    content: '{{ jarvis_ssl_private_key }}'
-    dest: /home/jarvis/.ssh/id_rsa
-    owner: jarvis
-    group: jarvis
-    mode: 0600
-  no_log: true
-  tags:
-    - ssh
-    - jarvis
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"
-
-- name: Install public key for kris
-  copy:
-    content: '{{ kris_ssl_certificate }}'
-    dest: /home/kris/.ssh/id_rsa.pub
-    owner: kris
-    group: kris
-    mode: 0644
-  tags:
-    - ssh
-    - kris
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"
-
-- name: Install private key for kris
-  copy:
-    content: '{{ kris_ssl_private_key }}'
-    dest: /home/kris/.ssh/id_rsa
-    owner: kris
-    group: kris
-    mode: 0600
-  no_log: true
-  tags:
-    - ssh
-    - kris
-  when:
-    - ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-    - inventory_hostname == "titanium"

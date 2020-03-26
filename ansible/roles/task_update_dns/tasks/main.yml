@@ -1,0 +1,15 @@
+---
+
+- name: Copy dnsmasq config to /etc/dnsmasq.d/02-localnet.conf
+  template:
+    src: 02-localnet.conf.j2
+    dest: /etc/dnsmasq.d/02-localnet.conf
+    force: yes
+  notify: restart dnsmasq
+
+- name: Copy updated dns hosts file to /etc/pihole/localnet.list
+  template:
+    src: localnet.list.j2
+    dest: /etc/pihole/localnet.list
+    force: yes
+  notify: restart pihole

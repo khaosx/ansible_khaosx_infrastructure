@@ -8,9 +8,6 @@
       - ansible_password: "{{ vault_jarvis_password }}"
       - kris_pw_hash: "{{ vault_kris_pw_hash }}"
       - plex_pw_hash: "{{ vault_plex_pw_hash }}"
-      - jarvis_ssl_certificate: "{{ vault_jarvis_ssl_certificate }}"
-      - jarvis_ssl_private_key: "{{ vault_jarvis_ssl_private_key }}"
-      - kris_ssl_certificate: "{{ vault_kris_ssl_certificate }}"
       - kris_ssl_private_key: "{{ vault_kris_ssl_private_key }}"
     vars_files:
       - ./vault.yml
@@ -42,4 +39,5 @@
   - hosts: pihole
     roles:
       - install_pihole
+      - task_update_dns
     become: yes
