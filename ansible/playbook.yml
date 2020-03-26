@@ -1,43 +1,62 @@
 ---
-  - hosts: all
-    roles:
-      - provision_system
-      - provision_users
-    vars:
-      - ansible_user: jarvis
-      - ansible_password: "{{ vault_jarvis_password }}"
-      - kris_pw_hash: "{{ vault_kris_pw_hash }}"
-      - plex_pw_hash: "{{ vault_plex_pw_hash }}"
-      - kris_ssl_private_key: "{{ vault_kris_ssl_private_key }}"
-    vars_files:
-      - ./vault.yml
-    become: yes
 
-  - hosts: database_mysql
-    roles:
-      - install_mysql
-    vars:
-      - mysql_root_password: "{{ vault_mysql_rootpw }}"
-    become: yes
+- hosts: all
+  roles:
+    - provision_system
+    - provision_users
+  vars:
+    - ansible_user: jarvis
+    - ansible_password: "{{ vault_jarvis_password }}"
+    - kris_pw_hash: "{{ vault_kris_pw_hash }}"
+    - plex_pw_hash: "{{ vault_plex_pw_hash }}"
+    - kris_ssl_private_key: "{{ vault_kris_ssl_private_key }}"
+  vars_files:
+    - ./vault.yml
+  become: yes
 
-  - hosts: plex
-    roles:
-      - install_plex_media_server
-      - install_nvidia_linux_drivers
-    vars:
-      - plex_pw_hash: "{{ vault_plex_pw_hash }}"
-      - smb_user: "{{ vault_smb_user }}"
-      - smb_pass: "{{ vault_smb_password }}"
-      - fstab_opts: 'credentials=/root/.smbcredentials,iocharset=utf8,vers=3.0,sec=ntlmssp,gid=910,forcegid,file_mode=0770,dir_mode=0770'
-    become: yes
+- hosts: database_mysql
+  roles:
+    - install_mysql
+  vars:
+    - ansible_user: jarvis
+    - ansible_password: "{{ vault_jarvis_password }}"
+    - mysql_root_password: "{{ vault_mysql_rootpw }}"
+  vars_files:
+    - ./vault.yml
+  become: yes
 
-  - hosts: dns_dhcp
-    roles:
-      - install_unbound
-    become: yes
+- hosts: plex
+  roles:
+    - install_plex_media_server
+    - install_nvidia_linux_drivers
+  vars:
+    - plex_pw_hash: "{{ vault_plex_pw_hash }}"
+    - smb_user: "{{ vault_smb_user }}"
+    - smb_pass: "{{ vault_smb_password }}"
+    - fstab_opts: 'credentials=/root/.smbcredentials,iocharset=utf8,vers=3.0,sec=ntlmssp,gid=910,forcegid,file_mode=0770,dir_mode=0770'
+    - ansible_user: jarvis
+    - ansible_password: "{{ vault_jarvis_password }}"
+  vars_files:
+    - ./vault.yml
+  become: yes
 
-  - hosts: pihole
-    roles:
-      - install_pihole
-      - task_update_dns
-    become: yes
+- hosts: dns_dhcp
+  roles:
+    - install_unbound
+  vars:
+    - ansible_user: jarvis
+    - ansible_password: "{{ vault_jarvis_password }}"
+  vars_files:
+    - ./vault.yml
+  become: yes
+
+- hosts: pihole
+  roles:
+    - install_pihole
+    - task_update_dns
+  vars:
+    - ansible_user: jarvis
+    - ansible_password: "{{ vault_jarvis_password }}"
+  vars_files:
+    - ./vault.yml
+  become: yes
